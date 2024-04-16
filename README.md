@@ -21,7 +21,10 @@
             width: calc(100% - 30px); /* Adjust width for icon */
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            background-color: rgb(255, 187, 240);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #cccccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
@@ -67,6 +70,52 @@
         }
         input:hover + .question-mark-container .tooltip, .tooltip:hover {
             display: block;
+        }
+        button[type="button"] {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -114,17 +163,18 @@
                 </span>
             </div>
             <br>
-            <button type="button" onclick="calculateTax()">Calculate Tax</button>
+            <button type="button" onclick="calculateTax()">Submit</button>
         </form>
-        <div id="resultDisplay"></div> <!-- Display area for tax calculation result -->
+        <div id="resultModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <p>Total Income: <span id="totalIncomeDisplay"></span></p>
+                <p id="taxResult"></p>
+            </div>
+        </div>
     </div>
 
     <script>
-        function toggleTooltip(tooltipId) {
-            const tooltip = document.getElementById(tooltipId);
-            tooltip.style.display = tooltip.style.display === 'block' ? 'none' : 'block';
-        }
-
         function calculateTax() {
             const grossIncome = parseFloat(document.getElementById('grossIncome').value);
             const extraIncome = parseFloat(document.getElementById('extraIncome').value) || 0;
@@ -136,11 +186,11 @@
                 return;
             }
 
-            let totalIncome = grossIncome + extraIncome;
-            let taxableIncome = totalIncome - deductions;
+            const totalIncome = grossIncome + extraIncome;
+            const taxableIncome = totalIncome - deductions;
 
             if (taxableIncome <= 0) {
-                displayResult('No tax applicable.');
+                displayModal('No tax applicable.', totalIncome);
                 return;
             }
 
@@ -160,12 +210,21 @@
             }
 
             const taxAmount = taxableIncome * taxRate;
-            displayResult(`Tax Amount: ${taxAmount.toFixed(2)} Lakhs`);
+            displayModal(`Tax Amount: ${taxAmount.toFixed(2)} Lakhs`, totalIncome);
         }
 
-        function displayResult(message) {
-            const resultDisplay = document.getElementById('resultDisplay');
-            resultDisplay.textContent = message;
+        function displayModal(message, totalIncome) {
+            const modal = document.getElementById('resultModal');
+            const resultText = document.getElementById('taxResult');
+            const totalIncomeDisplay = document.getElementById('totalIncomeDisplay');
+            resultText.textContent = message;
+            totalIncomeDisplay.textContent = `Total Income: ${totalIncome.toFixed(2)} Lakhs`;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            modal.style.display = 'none';
         }
     </script>
 </body>
